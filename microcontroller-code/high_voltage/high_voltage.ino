@@ -7,7 +7,9 @@
 #include <Firebase_ESP_Client.h>
 #include "addons/TokenHelper.h"
 #include "addons/RTDBHelper.h"
- 
+
+#include <ArduinoJson.h>
+
 #define SS_PIN 21
 #define RST_PIN 22
 #define LED_G 2 //define green LED pin
@@ -34,6 +36,7 @@ FirebaseAuth auth;
 FirebaseConfig config;
 bool signupOK=false;
 FirebaseJson json;
+DynamicJsonDocument doc(1024);
 
 void connectToWifi()
 {
@@ -186,16 +189,35 @@ void loop()
     digitalWrite(LED_R, HIGH);
     digitalWrite(BUZZER,HIGH);
     String pth="Unauthorized/"+content;
-    json.set("UID",content);
-    json.set("TimeStamp",time);
-    json.set("Date",date);
-    json.set("Zone","High Voltage Zone");
+    if(Firebase.RTDB.getJSON(&fbdo, pth))
+    {
+      const char *data=fbdo.to<FirebaseJson>().raw();
+      deserializeJson(doc, data);
+      String et=doc[String("Entries")];
+      int entry_val=et.toInt();
+      entry_val=entry_val+1;
+      json.set("UID",content);
+      json.set("TimeStamp",time);
+      json.set("Date",date);
+      json.set("Zone","High Voltage Zone");
+      json.set("Entries",String(entry_val));
+    }
+    else
+    {
+      json.set("UID",content);
+      json.set("TimeStamp",time);
+      json.set("Date",date);
+      json.set("Zone","High Voltage Zone");
+      json.set("Entries","1");
+    }
+    
+
     if (Firebase.RTDB.setJSON(&fbdo, pth, &json ))
     {
-      Serial.println("PASSED");
-      Serial.println("PATH: " + fbdo.dataPath());
-      Serial.println("TYPE: " + fbdo.dataType());
-    }
+        Serial.println("PASSED");
+        Serial.println("PATH: " + fbdo.dataPath());
+        Serial.println("TYPE: " + fbdo.dataType());
+    }  
     else
     {
       Serial.println("FAILED");
