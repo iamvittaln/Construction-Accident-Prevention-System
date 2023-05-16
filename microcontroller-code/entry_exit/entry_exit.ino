@@ -103,9 +103,6 @@ void setup()
 
   Serial.println("Put your card to the RFID reader...");
   Serial.println();
-
-  //JSON
-  
 }
 
 void loop()
