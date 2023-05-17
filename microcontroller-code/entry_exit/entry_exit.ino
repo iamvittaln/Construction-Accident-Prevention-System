@@ -34,8 +34,8 @@ const int   daylightOffset_sec = 0;
 //Provide the RTDB payload printing info and other helper functions.
 #include "addons/RTDBHelper.h"
 
-#define WIFI_SSID "TRIN 7151"
-#define WIFI_PASSWORD "Trin@7161"
+#define WIFI_SSID "Ideapad3 - Windows"
+#define WIFI_PASSWORD "12345678"
 
 #define API_KEY "AIzaSyA328XAjBnlh7zLhlL4KDg0cU1KZWxlYyM"
 
@@ -177,10 +177,8 @@ void loop()
     String et=doc[String("Entries")];
     int entry_val=et.toInt();
     entry_val=entry_val+1;
-    Serial.println(entry_val);
     if(entry_val%2==0)
     {
-      Serial.println("outing");
       json.set("UID",content);
       json.set("InTimeStamp",oldtime);
       json.set("Date",date);
@@ -189,7 +187,6 @@ void loop()
     }
     else
     {
-      Serial.println("IN");
       json.set("UID",content);
       json.set("InTimeStamp",time);
       json.set("Date",date);
@@ -199,7 +196,6 @@ void loop()
   }
   else
   {
-    Serial.println("1st");
     json.set("UID",content);
     json.set("InTimeStamp",time);
     json.set("Date",date);

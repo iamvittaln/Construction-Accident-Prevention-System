@@ -25,8 +25,8 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 19800;
 const int   daylightOffset_sec = 0;
 
-#define WIFI_SSID "TRIN 7151"
-#define WIFI_PASSWORD "Trin@7161"
+#define WIFI_SSID "Ideapad3 - Windows"
+#define WIFI_PASSWORD "12345678"
 
 #define API_KEY "AIzaSyA328XAjBnlh7zLhlL4KDg0cU1KZWxlYyM"
 #define DATABASE_URL "rfid-attendance-system-fbc24-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -64,8 +64,6 @@ void setup()
   pinMode(LED_R, OUTPUT);
   pinMode(BUZZER, OUTPUT);
   digitalWrite(BUZZER,LOW);
-  Serial.println("Put your card to the RFID reader...");
-  Serial.println();
   lcd.begin(16,2);
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -79,7 +77,7 @@ void setup()
 
   /* Sign up */
   if (Firebase.signUp(&config, &auth, "", "")){
-    Serial.println("ok");
+    Serial.println("Connected to Firebase");
     signupOK = true;
   }
   else{
@@ -91,6 +89,9 @@ void setup()
   
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
+
+  Serial.println("Put your card to the RFID reader...");
+  Serial.println();
 }
 void loop()
 {
@@ -120,7 +121,6 @@ void loop()
   lcd.setCursor(0,0);
   lcd.print(content);
   lcd.setCursor(0,1);
-  Serial.print("Message : ");
   content.toUpperCase();
 
   struct tm timeinfo;
@@ -168,13 +168,13 @@ void loop()
     json.set("Zone","High Voltage Zone");
     if (Firebase.RTDB.setJSON(&fbdo, pth, &json ))
     {
-      Serial.println("PASSED");
+      Serial.println("Data sent to Firebase!");
       Serial.println("PATH: " + fbdo.dataPath());
       Serial.println("TYPE: " + fbdo.dataType());
     }
     else
     {
-      Serial.println("FAILED");
+      Serial.println("Data not sent to Firebase!");
       Serial.println("REASON: " + fbdo.errorReason());
     }
     Serial.println();
@@ -214,13 +214,13 @@ void loop()
 
     if (Firebase.RTDB.setJSON(&fbdo, pth, &json ))
     {
-        Serial.println("PASSED");
+        Serial.println("Data sent to Firebase!");
         Serial.println("PATH: " + fbdo.dataPath());
         Serial.println("TYPE: " + fbdo.dataType());
     }  
     else
     {
-      Serial.println("FAILED");
+      Serial.println("Data not sent to Firebase!");
       Serial.println("REASON: " + fbdo.errorReason());
     }
     delay(3000);
