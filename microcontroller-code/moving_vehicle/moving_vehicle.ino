@@ -6,6 +6,8 @@
 #include <Firebase_ESP_Client.h>
 #include "addons/TokenHelper.h"
 #include "addons/RTDBHelper.h"
+
+#include <ArduinoJson.h>
  
 #define SS_PIN 21
 #define RST_PIN 22
@@ -30,6 +32,7 @@ FirebaseAuth auth;
 FirebaseConfig config;
 bool signupOK=false;
 FirebaseJson json;
+DynamicJsonDocument doc(1024);
 
 void connectToWifi()
 {
@@ -150,11 +153,26 @@ void loop()
   String date=day+"-"+month+"-"+year+", "+weekday; 
    
   String pth="Unauthorized/"+content;
-  json.set("UID",content);
-  json.set("TimeStamp",time);
-  json.set("Date",date);
-  json.set("Zone","Moving Vehicle");
-
+  if(Firebase.RTDB.getJSON(&fbdo, pth))
+  {
+    const char *data=fbdo.to<FirebaseJson>().raw();
+    deserializeJson(doc, data);
+    String et=doc[String("Entries")];
+    json.set("UID",content);
+    json.set("TimeStamp",time);
+    json.set("Date",date);
+    json.set("Zone","Moving Vehicle");
+    json.set("Entries",et);
+  }
+  else
+  {
+    json.set("UID",content);
+    json.set("TimeStamp",time);
+    json.set("Date",date);
+    json.set("Zone","Moving Vehicle");
+    json.set("Entries","0");
+  }
+    
   if (Firebase.RTDB.setJSON(&fbdo, pth, &json ))
   {
       Serial.println("Data sent to Firebase!");
